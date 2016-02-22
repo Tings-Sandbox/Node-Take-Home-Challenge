@@ -20,19 +20,39 @@ process.stdin.on('data', function (text) {
 //returns an array of questionids according to specifications
 function returnQuestionIds(number) {
   console.log(number, "number of questions");
+  var qIds = [];
   readCSV(__dirname+'/questions.csv', function(allQ){
-    console.log("allQ", allQ);
     var groupedQ = groupQuestions(allQ);
-    
+
+    //dive into each layer of arrays, calculating number of questions to pass along to the next layer. it will push the respective number of questions into the qIds
+    function recurse (set, numberOfQs){
+      if (Array.isArray(set[0])){
+        //does not yet account for unevenly divisible numbers
+        newNumberOfQs = numberOfQs/set.length;
+        set.forEach(function(subset){
+          recurse(subset,newNumberOfQs);
+        })
+      } else {
+        for (var i = 0; i < numberOfQs; i++){
+          qIds.push(set.question_id);
+        }
+      }
+    }
+
+    recurse(groupedQ);
+    console.log(qIds);
+    return qIds;
   });
 };
 
+
+
+
+
 //HELPER FUNCTIONS
 function readCSV(file, cb){
-  console.log('file',file);
   var rs = fs.createReadStream(file);
   var parser = parse({columns: true}, function(err, output){
-    console.log(output);
     cb(output)
   });
   rs.pipe(parser);
