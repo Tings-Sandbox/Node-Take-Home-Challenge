@@ -1,47 +1,46 @@
-process.stdin.resume();
-process.stdin.setEncoding('utf8');
 var util = require('util');
 var parse = require('csv-parse');
 var fs = require('fs');
 
 
-var number;
-
 //Prompt User For Number of Questions
+var number;
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
+console.log('Hi, enter a number for your questtion Ids or type quit.');
 process.stdin.on('data', function (text) {
-  console.log('How many questions:', util.inspect(text));
   if (text > 0) {
     number = text;
     returnQuestionIds(parseInt(number));
+  } if (text === 'quit\r\n' || text === 'quit\n'){
     done();
   }
 });
 
-//returns an array of questionids according to specifications
+//MAIN FUNCTION: returns an array of questionids according to specifications
 function returnQuestionIds(number) {
-  console.log(number, "number of questions");
+  // console.log(number, "number of questions");
   var qIds = [];
 
   readCSV(__dirname+'/questions.csv', function(allQ){
     var groupedQ = groupQuestions(allQ);
     
-    //dive into each layer of arrays, calculating number of questions to pass along to the next layer. it will push the respective number of questions into the qIds
     function recurse (set, numberOfQs){
       if (Array.isArray(set[0])){
 
         var newNumberOfQs = parseInt(numberOfQs/set.length);
         var remainingNumOfQs = parseInt(numberOfQs%set.length);
 
-        console.log(parseInt(newNumberOfQs), "newNumberOfQs");
+        // console.log(parseInt(newNumberOfQs), "newNumberOfQs");
         
         set.forEach(function(subset){
-          recurse(subset,newNumberOfQs);
+          if (remainingNumOfQs > 0) {
+            recurse(subset,newNumberOfQs+1);
+            remainingNumOfQs--;
+          } else {
+            recurse(subset,newNumberOfQs);
+          }
         })
-
-        //recurse again with the remainders
-        for (var k = 0; k < remainingNumOfQs; k++){
-          recurse(set[k], remainingNumOfQs);
-        }
 
       } else {
         var counter = 0;
@@ -50,7 +49,7 @@ function returnQuestionIds(number) {
           qIds.push(set[index].question_id);
           counter++;
           index = counter % set.length;
-          console.log(set);  
+          // console.log(set);  
         }
       }
     }
@@ -65,7 +64,7 @@ function returnQuestionIds(number) {
 
 
 
-//HELPER FUNCTIONS
+/*****************************HELPER FUNCTIONS***********************************/
 function readCSV(file, cb){
   var rs = fs.createReadStream(file);
   var parser = parse({columns: true}, function(err, output){
@@ -88,7 +87,7 @@ function groupQuestions(allQ){
   })
 
   groupedQ[1] = cleanArray(groupedQ[1]);
-  console.log(util.inspect(groupedQ, false, null));
+  // console.log(util.inspect(groupedQ, false, null));
   return groupedQ;
 }
 
@@ -102,9 +101,10 @@ function cleanArray(actual) {
   return newArray;
 }
 
+
 function done() {
-  console.log('Now that process.stdin is paused, there is nothing more to do.');
-  // process.exit();
+  console.log('Bye!');
+  process.exit();
 }
 
 
