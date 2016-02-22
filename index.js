@@ -28,14 +28,21 @@ function returnQuestionIds(number) {
     //dive into each layer of arrays, calculating number of questions to pass along to the next layer. it will push the respective number of questions into the qIds
     function recurse (set, numberOfQs){
       if (Array.isArray(set[0])){
-        //does not yet account for unevenly divisible numbers
+
         var newNumberOfQs = parseInt(numberOfQs/set.length);
-        
+        var remainingNumOfQs = parseInt(numberOfQs%set.length);
+
         console.log(parseInt(newNumberOfQs), "newNumberOfQs");
         
         set.forEach(function(subset){
           recurse(subset,newNumberOfQs);
         })
+
+        //recurse again with the remainders
+        for (var k = 0; k < remainingNumOfQs; k++){
+          recurse(set[k], remainingNumOfQs);
+        }
+
       } else {
         var counter = 0;
         var index = counter % set.length;
