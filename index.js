@@ -23,12 +23,11 @@ function returnQuestionIds(number) {
   var qIds = [];
   readCSV(__dirname+'/questions.csv', function(allQ){
     var groupedQ = groupQuestions(allQ);
-
     //dive into each layer of arrays, calculating number of questions to pass along to the next layer. it will push the respective number of questions into the qIds
     function recurse (set, numberOfQs){
       if (Array.isArray(set[0])){
         //does not yet account for unevenly divisible numbers
-        newNumberOfQs = parseInt(numberOfQs/set.length);
+        var newNumberOfQs = parseInt(numberOfQs/set.length);
         console.log(parseInt(newNumberOfQs), "newNumberOfQs");
         set.forEach(function(subset){
           recurse(subset,newNumberOfQs);
@@ -41,7 +40,7 @@ function returnQuestionIds(number) {
       }
     }
 
-    recurse(groupedQ, number);
+    recurse(groupedQ, number, qIds);
     console.log(qIds);
     return qIds;
   });
