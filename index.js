@@ -28,18 +28,20 @@ function returnQuestionIds(number) {
     function recurse (set, numberOfQs){
       if (Array.isArray(set[0])){
         //does not yet account for unevenly divisible numbers
-        newNumberOfQs = numberOfQs/set.length;
+        newNumberOfQs = parseInt(numberOfQs/set.length);
+        console.log(parseInt(newNumberOfQs), "newNumberOfQs");
         set.forEach(function(subset){
           recurse(subset,newNumberOfQs);
         })
       } else {
         for (var i = 0; i < numberOfQs; i++){
-          qIds.push(set.question_id);
+          console.log(set);
+          qIds.push(set[i].question_id);
         }
       }
     }
 
-    recurse(groupedQ);
+    recurse(groupedQ, number);
     console.log(qIds);
     return qIds;
   });
